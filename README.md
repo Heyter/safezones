@@ -21,7 +21,7 @@
 	* Sets ACF enabled in the zone ACFZone
 * safezone_setcolor "Name" "R" "G" "B"
 	* Sets the color of a safezone.
-	* Example: safezone_setcolor "Zone" "255" "0" "0"
+	* Example: safezone_setcolor "Zone" "255" "0" "0" "0"
 * safezone_remove "Name"
 	* Removes the given zone.
 	* Example: safezone_remove "Zone"

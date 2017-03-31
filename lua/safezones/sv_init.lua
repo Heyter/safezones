@@ -57,7 +57,6 @@ local function init()
 	end
 end 
 hook.Add( "Initialize", "Safezones_init", init )
-
 -- ------------------------------------ -- 
 -- ------- Custom Chat Messages ------- -- 
 -- ------------------------------------ --
@@ -311,12 +310,12 @@ end )
 
 concommand.Add( "safezone_setcolor", function( ply, _, args ) 
 	if not ply:IsSuperAdmin() then return end 
-	local r,g,b = tonumber(args[2]), tonumber(args[3]), tonumber(args[4])
+	local r,g,b,a = tonumber(args[2]), tonumber(args[3]), tonumber(args[4]), tonumber(args[5] or 255) 
 	
 	for k,v in pairs( Zones.zones ) do 
 		if v:Name() == args[1] then
-			v:SetColor( Color( r, g, b ) )
-			Zones.success( ply, string.format( "%s color changed to: %i, %i, %i", args[1], r, g, b ) )
+			v:SetColor( Color( r, g, b,a ) )
+			Zones.success( ply, string.format( "%s color changed to: %i, %i, %i, %i", args[1], r, g, b,a ) )
 			Zones.sendData()
 			break
 		end 
@@ -394,7 +393,6 @@ local noZones = Zones.noZones
 
 local function takeDamage( ent, dmgInfo )
 	if noZones() then return dmgInfo end 
-
 	if ent:InSafeZone() then 
 		dmgInfo:SetDamage(0)
 		return dmgInfo
@@ -426,8 +424,8 @@ hook.Add( "PlayerInitialSpawn", "Safezones_FirstSpawn", playerInitialSpawn )
 local function playerSpawn( ply )
 	if #Zones.spawns < 1 then return end 
 	local i = math.random( 1, #Zones.spawns )
-
 	ply:SetPos( Zones.spawns[i] + Vector(0,0,10) )
+	return true
 end 
 hook.Add( "PlayerSpawn", "Safezones_Spawn", playerSpawn )
 
@@ -521,13 +519,11 @@ end
 -- Check if inside safezone 
 local entmeta = FindMetaTable( "Entity" )
 function entmeta:InSafeZone( name ) 
-	local pos = self:GetPos()
-
+	local pos = self:EyePos()
 	-- not using a pairs loop to increase speed in luajit
 	for i=1,table.Count(Zones.zones) do 
 		local zone = Zones.zones[i]
 		if name ~= nil and zone._name ~= name then continue end
-
 		if inrange( pos, zone._truemin, zone._truemax ) then 
 			return true 
 		end 
